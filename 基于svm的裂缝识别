@@ -1,39 +1,42 @@
 from sklearn import svm
 from sklearn.metrics import classification_report
+import numpy as np
+import pandas as pd
 
-# 定义svm-svc识别算法
+# Define the SVM classifier function (SVC)
 def svm_svc(x_train, y_train, x):
-    clf = svm.SVC()  # 支持向量机分类器
-    clf.fit(x_train, y_train)  # 训练模型
-    answer = clf.predict(x)  # 预测结果
+    clf = svm.SVC()  # Support Vector Machine Classifier
+    clf.fit(x_train, y_train)  # Train the model
+    answer = clf.predict(x)  # Predict the results
     return answer
 
-# 定义svm线性识别算法
+# Define the linear SVM classifier function (LinearSVC)
 def svm_linear_svc(x_train, y_train, x):
-    clf = svm.LinearSVC()  # 线性支持向量机分类器
-    clf.fit(x_train, y_train)  # 训练模型
-    answer = clf.predict(x)  # 预测结果
+    clf = svm.LinearSVC()  # Linear Support Vector Machine Classifier
+    clf.fit(x_train, y_train)  # Train the model
+    answer = clf.predict(x)  # Predict the results
     return answer
 
+# Example: Using SVM algorithms
 def svm_example():
-    # 读取数据
-    df = pd.read_excel('./datab/裂缝识别样本_yb.xlsx', sheet_name='Sheet1')
-    # 获取x训练参数和y训练数据
+    # Read data
+    df = pd.read_excel('./datab/crack_recognition_sample_yb.xlsx', sheet_name='Sheet1')
+    # Get x_train parameters and y_train data
     x_train = np.array(df[["AC_nor", 'DEN_nor', "CNL_nor", "RD_nor", "RS_nor", "RDS_nor"]])
     y_train = np.array(df["mom"]).tolist()
 
-    # 读取需要识别的数据
-    wellname = '某井'  # 请根据需要修改
+    # Read the data that needs to be predicted
+    wellname = 'Well_X'  # Modify as needed
     data = pd.read_excel(f'./data/temp/{wellname}.xlsx', sheet_name='Sheet1')
     x = np.array(data[["AC_nor", 'DEN_nor', "CNL_nor", "RD_nor", "RS_nor", "RDS_nor"]])
 
-    # 使用SVM算法进行预测
+    # Use SVM algorithm for prediction
     predictions = svm_svc(x_train, y_train, x)
 
-    # 输出预测结果
+    # Output the prediction results
     print(predictions)
-    # 如果需要，可以计算准确率等指标
-    print(classification_report(y_train, predictions, target_names=['nan', '无', '半', '全']))
+    # Optionally, you can calculate accuracy and other metrics
+    print(classification_report(y_train, predictions, target_names=['nan', 'None', 'Half', 'Full']))
 
-# 示例调用
+# Example call
 svm_example()
