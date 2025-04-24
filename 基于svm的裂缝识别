@@ -1,0 +1,39 @@
+from sklearn import svm
+from sklearn.metrics import classification_report
+
+# 定义svm-svc识别算法
+def svm_svc(x_train, y_train, x):
+    clf = svm.SVC()  # 支持向量机分类器
+    clf.fit(x_train, y_train)  # 训练模型
+    answer = clf.predict(x)  # 预测结果
+    return answer
+
+# 定义svm线性识别算法
+def svm_linear_svc(x_train, y_train, x):
+    clf = svm.LinearSVC()  # 线性支持向量机分类器
+    clf.fit(x_train, y_train)  # 训练模型
+    answer = clf.predict(x)  # 预测结果
+    return answer
+
+def svm_example():
+    # 读取数据
+    df = pd.read_excel('./datab/裂缝识别样本_yb.xlsx', sheet_name='Sheet1')
+    # 获取x训练参数和y训练数据
+    x_train = np.array(df[["AC_nor", 'DEN_nor', "CNL_nor", "RD_nor", "RS_nor", "RDS_nor"]])
+    y_train = np.array(df["mom"]).tolist()
+
+    # 读取需要识别的数据
+    wellname = '某井'  # 请根据需要修改
+    data = pd.read_excel(f'./data/temp/{wellname}.xlsx', sheet_name='Sheet1')
+    x = np.array(data[["AC_nor", 'DEN_nor', "CNL_nor", "RD_nor", "RS_nor", "RDS_nor"]])
+
+    # 使用SVM算法进行预测
+    predictions = svm_svc(x_train, y_train, x)
+
+    # 输出预测结果
+    print(predictions)
+    # 如果需要，可以计算准确率等指标
+    print(classification_report(y_train, predictions, target_names=['nan', '无', '半', '全']))
+
+# 示例调用
+svm_example()
