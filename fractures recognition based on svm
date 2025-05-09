@@ -1,42 +1,223 @@
+# Import libraries
+import numpy as np
+from sklearn import neighbors
 from sklearn import svm
 from sklearn.metrics import classification_report
-import numpy as np
+from sklearn.naive_bayes import GaussianNB, MultinomialNB, BernoulliNB
 import pandas as pd
+from sklearn.tree import DecisionTreeRegressor
+import deal_data
 
-# Define the SVM classifier function (SVC)
+# Define KNN classification algorithm
+def knn_algorithm(x_train, y_train, x, k):
+    clf = neighbors.KNeighborsClassifier(algorithm='kd_tree', n_neighbors=k)
+    clf.fit(x_train, y_train)
+    answer = clf.predict(x)
+    return answer
+
+# Define SVM (SVC) classification algorithm
 def svm_svc(x_train, y_train, x):
-    clf = svm.SVC()  # Support Vector Machine Classifier
-    clf.fit(x_train, y_train)  # Train the model
-    answer = clf.predict(x)  # Predict the results
+    clf = svm.SVC()
+    clf.fit(x_train, y_train)
+    answer = clf.predict(x)
     return answer
 
-# Define the linear SVM classifier function (LinearSVC)
+# Define linear SVM classification algorithm
 def svm_linear_svc(x_train, y_train, x):
-    clf = svm.LinearSVC()  # Linear Support Vector Machine Classifier
-    clf.fit(x_train, y_train)  # Train the model
-    answer = clf.predict(x)  # Predict the results
+    clf = svm.LinearSVC()
+    clf.fit(x_train, y_train)
+    answer = clf.predict(x)
     return answer
 
-# Example: Using SVM algorithms
-def svm_example():
-    # Read data
-    df = pd.read_excel('./datab/crack_recognition_sample_yb.xlsx', sheet_name='Sheet1')
-    # Get x_train parameters and y_train data
-    x_train = np.array(df[["AC_nor", 'DEN_nor', "CNL_nor", "RD_nor", "RS_nor", "RDS_nor"]])
-    y_train = np.array(df["mom"]).tolist()
+# Define Gaussian Naive Bayes classification algorithm
+def Gaussian_nbc(x_train, y_train, x):
+    clf = GaussianNB()
+    clf.fit(x_train, y_train)
+    answer = clf.predict(x)
+    return answer
 
-    # Read the data that needs to be predicted
-    wellname = 'Well_X'  # Modify as needed
-    data = pd.read_excel(f'./data/temp/{wellname}.xlsx', sheet_name='Sheet1')
-    x = np.array(data[["AC_nor", 'DEN_nor', "CNL_nor", "RD_nor", "RS_nor", "RDS_nor"]])
+# Define Decision Tree Regression algorithm
+def dtr(x_train, y_train, x):
+    regressor = DecisionTreeRegressor(random_state=0).fit(x_train, y_train)
+    answer = regressor.predict(x)
+    return answer
 
-    # Use SVM algorithm for prediction
-    predictions = svm_svc(x_train, y_train, x)
+# Define Multinomial Naive Bayes classification algorithm
+def Multinomial_nbc(x_train, y_train, x):
+    clf = MultinomialNB()
+    clf.fit(x_train, y_train)
+    answer = clf.predict(x)
+    return answer
 
-    # Output the prediction results
-    print(predictions)
-    # Optionally, you can calculate accuracy and other metrics
-    print(classification_report(y_train, predictions, target_names=['nan', 'None', 'Half', 'Full']))
+# Define Bernoulli Naive Bayes classification algorithm
+def Bernoulli_nbc(x_train, y_train, x):
+    print("BernoulliNB")
+    clf = BernoulliNB()
+    clf.fit(x_train, y_train)
+    answer = clf.predict(x)
+    return answer
 
-# Example call
-svm_example()
+# Accuracy calculation
+def cal_accuracy(y, answer):
+    print(classification_report(y, answer, target_names=['nan', 'None', 'Partial', 'Full']))
+
+# Get training sample parameters
+def getxTrain(wellname, data):
+    x_train = np.array(data[["AC_nor", 'DEN_nor', "CN_nor", "RD_nor", "RS_nor", "RDS_nor"]])
+    if wellname == 'MY1_Guide':
+        x_train = np.array(data[["AC_nor", 'CN_nor', 'DEN_nor']])
+    if wellname == 'M49':
+        x_train = np.array(data[["AC_nor", 'CN_nor', 'DEN_nor', "RD_nor"]])
+    if wellname == 'FN4':
+        x_train = np.array(data[["AC_nor", 'DEN_nor', "RD_nor"]])
+    if wellname == 'YY1H':
+        x_train = np.array(data[["GR_nor", 'CN_nor', 'RDS_nor', "RD_nor", "RS_nor"]])
+    if wellname == 'PA1_Well':
+        x_train = np.array(data[["GR_nor", 'CN_nor', 'DEN_nor']])
+    if wellname == 'PY1_Well':
+        x_train = np.array(data[["AC_nor", 'DEN_nor', 'GR_nor']])
+    if wellname == '2402':
+        x_train = np.array(data[["CAL_nor", "RD_nor", "RS_nor", "RDS_nor", 'GR_nor']])
+    if wellname in ['2401', '106', '101-1']:
+        x_train = np.array(data[["AC_nor", "CAL_nor", "RD_nor", "RS_nor", "RDS_nor", 'GR_nor']])
+    if wellname in ['104-2', '103']:
+        x_train = np.array(data[["AC_nor", 'DEN_nor', "CAL_nor", "RD_nor", "RS_nor", "RDS_nor", 'GR_nor']])
+    return x_train
+
+# Get sample parameters for prediction
+def getx(wellname, data):
+    x = np.array(data[["AC_nor", 'DEN_nor', "CN_nor", "RD_nor", "RS_nor", "RDS_nor"]])
+    if wellname == 'MY1_Guide':
+        x = np.array(data[["AC_nor", 'CN_nor', 'DEN_nor']])
+    if wellname == 'M49':
+        x = np.array(data[["AC_nor", 'CN_nor', 'DEN_nor', "RD_nor"]])
+    if wellname == 'FN4':
+        x = np.array(data[["AC_nor", 'DEN_nor', "RD_nor"]])
+    if wellname == 'YY1H':
+        x = np.array(data[["GR_nor", 'CN_nor', 'RDS_nor', "RD_nor", "RS_nor"]])
+    if wellname == 'PA1_Well':
+        x = np.array(data[["GR_nor", 'CN_nor', 'DEN_nor']])
+    if wellname == 'PY1_Well':
+        x = np.array(data[["AC_nor", 'DEN_nor', 'GR_nor']])
+    if wellname == '2402':
+        x = np.array(data[["CAL_nor", "RD_nor", "RS_nor", "RDS_nor", 'GR_nor']])
+    if wellname in ['2401', '106', '101-1']:
+        x = np.array(data[["AC_nor", "CAL_nor", "RD_nor", "RS_nor", "RDS_nor", 'GR_nor']])
+    if wellname in ['104-2', '103']:
+        x = np.array(data[["AC_nor", 'DEN_nor', "CAL_nor", "RD_nor", "RS_nor", "RDS_nor", 'GR_nor']])
+    return x
+if __name__ == '__main__':
+    # Get file path and list of wells
+    file_path = "./data/temp/"
+    well_list = deal_data.get_file_name(file_path)
+
+    # Load fracture identification sample
+    df = pd.read_excel('./data/lib/fracture_sample.xlsx', sheet_name='Sheet1')
+
+    # Loop through each well to calculate fracture identification
+    for wellname in well_list:
+        print(wellname)
+
+        # Get training parameters (features)
+        x_train = getxTrain(wellname, df)
+        # Get training labels (target)
+        y_train = np.array(df["mom"]).tolist()
+
+        # Load data to be identified
+        data = pd.read_excel(file_path + wellname + ".xlsx", sheet_name='Sheet1')
+        # Get input features for prediction
+        x = getx(wellname, data)
+
+        # Use KNN (k=1) for prediction
+        knn_k_1 = pd.DataFrame({"knn_k_1": knn_algorithm(x_train, y_train, x, 1)})
+        # Use Decision Tree for prediction
+        dtr1 = pd.DataFrame({"dtr": dtr(x_train, y_train, x)})
+
+        # Merge predictions by columns
+        result1 = pd.concat([knn_k_1, dtr1], axis=1)
+        # Sum across rows to combine predictions
+        result1['total_vote'] = result1.apply(lambda x: x.sum(), axis=1)
+
+        # Create new fracture identification column with default 0
+        result1['fracture_identified'] = 0
+        # Mark rows where both classifiers agree (vote == 2) as fractures
+        result1.loc[result1['total_vote'] == 2, 'fracture_identified'] = 1
+
+        # Reassign depth information for alignment
+        result1['depth'] = data[['深度']].reset_index(drop=True)
+
+        # Merge prediction results with original data on depth
+        data = pd.merge(data, result1, how='outer', on='depth')
+
+        # Fill missing values with 0
+        data.fillna(0, inplace=True)
+
+        # Remove false positives based on high GR value
+        data.loc[(data['GR'] > 120), 'fracture_identified'] = 0
+
+        # Save fracture identification results
+        with pd.ExcelWriter(file_path + wellname + ".xlsx", if_sheet_exists='replace', mode='a', engine='openpyxl') as writer:
+            data.to_excel(writer, sheet_name='Sheet1', index=False)
+
+    # Dip angle identification
+    DJ_sample = pd.read_excel('./data/lib/dip_angle_sample.xlsx', sheet_name='Sheet1')
+
+    for well_name in well_list:
+        print(well_name)
+        x_QJ = getxTrain(well_name, DJ_sample)
+        y_QJ = np.array(DJ_sample["dip_angle_label"].tolist())
+
+        # Load data
+        select_QJ_data = pd.read_excel(file_path + well_name + '.xlsx', sheet_name='Sheet1')
+
+        # Filter out data where fracture was identified
+        sel_data = select_QJ_data[(select_QJ_data['fracture_identified'] == 1)]
+        sel_data = sel_data.reset_index(drop=True)
+
+        # Get features
+        sel_data_1 = getx(well_name, sel_data)
+        DEEP = sel_data[["depth"]]
+
+        # Use KNN to identify dip angle
+        knn_k_1_QJ = pd.DataFrame({"dip_angle_identified": knn_algorithm(x_QJ, y_QJ, sel_data_1, 1)})
+
+        # Map class labels to dip angles
+        knn_k_1_QJ.loc[knn_k_1_QJ['dip_angle_identified'] == 1] = 7.5
+        knn_k_1_QJ.loc[knn_k_1_QJ['dip_angle_identified'] == 2] = 30
+        knn_k_1_QJ.loc[knn_k_1_QJ['dip_angle_identified'] == 3] = 60
+        knn_k_1_QJ.loc[knn_k_1_QJ['dip_angle_identified'] == 4] = 82.5
+
+        result_QJ = pd.concat([sel_data[["depth"]], knn_k_1_QJ], axis=1)
+
+        # Convert dip angle values to descriptive types
+        result_QJ.loc[result_QJ['dip_angle_identified'] == 7.5, 'dip_type'] = 'Horizontal Fracture'
+        result_QJ.loc[result_QJ['dip_angle_identified'] == 30, 'dip_type'] = 'Low-angle Fracture'
+        result_QJ.loc[result_QJ['dip_angle_identified'] == 60, 'dip_type'] = 'High-angle Fracture'
+        result_QJ.loc[result_QJ['dip_angle_identified'] == 82.5, 'dip_type'] = 'Vertical Fracture'
+
+        # Save dip angle results
+        with pd.ExcelWriter(file_path + well_name + '.xlsx', if_sheet_exists='replace', mode='a', engine='openpyxl') as writer:
+            result_QJ.to_excel(writer, sheet_name="Dip_Angle_Result", index=False)
+
+    # Filling identification
+    CT_sample = pd.read_excel('./data/lib/filling_sample.xlsx', sheet_name='Sheet1')
+
+    for well_name in well_list:
+        print(well_name)
+        x_CT = getxTrain(well_name, CT_sample)
+        y_CT = np.array(CT_sample["filling_label"]).tolist()
+
+        select_CT_data = pd.read_excel(file_path + well_name + '.xlsx', sheet_name='Sheet1')
+        sel_data = select_CT_data[(select_CT_data['fracture_identified'] == 1)]
+        sel_data = sel_data.reset_index(drop=True)
+        sel_data_1 = getx(well_name, sel_data)
+
+        dtr_CT = pd.DataFrame({"filling_identified": dtr(x_CT, y_CT, sel_data_1)})
+        result_CT = pd.concat([sel_data[["depth"]], dtr_CT], axis=1)
+
+        result_CT.loc[result_CT['filling_identified'] == 1, 'filling_type'] = 'Unfilled'
+        result_CT.loc[result_CT['filling_identified'] == 2, 'filling_type'] = 'Semi-filled'
+        result_CT.loc[result_CT['filling_identified'] == 3, 'filling_type'] = 'Fully-filled'
+
+        with pd.ExcelWriter(file_path + well_name + '.xlsx', if_sheet_exists='replace', mode='a', engine='openpyxl') as writer:
+            result_CT.to_excel(writer, sheet_name="Filling_Result", index=False)
